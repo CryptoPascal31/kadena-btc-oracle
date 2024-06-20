@@ -1,0 +1,6 @@
+.PHONY: all tests
+
+all: tests
+
+tests:
+	make -C tests tests

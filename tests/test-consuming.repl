@@ -1,0 +1,64 @@
+(load "init.repl")
+
+; For this test we play in the 800000 - 800050 blocks range
+
+; https://mempool.space/block/00000000000000000002a7c4c1e48d76c5a37902165a270156b7a8d72728a054
+; https://mempool.space/block/00000000000000000003ebef28f91c20ccbc948055520a56b695a7a05a96a259
+
+; Block 40 TS is 2023-07-24 09:46:08
+; Last block: 50 TS = 2023-07-24 11:34:14
+(begin-tx)
+(use btc-oracle)
+(load "vectors/blocks-800000-800050-init.repl")
+(commit-tx)
+
+
+
+(begin-tx)
+(use btc-oracle)
+; Check that we can retrieve the tip
+(expect-that "Block 50 expected" (compose (at 'height) (= 800050)) (get-tip))
+
+; Check that we can retrive the last 4 blocks
+(expect-that "Blocks 47,48,49,50 expeected" (compose (map (at 'height)) (= [800050 800049 800048 800047])) (get-last-blocks 4))
+
+; Get block by hash
+(expect-that "Get block 50 by Hash" (compose (at 'height) (= 800050)) (get-block-by-hex-hash "00000000000000000003ebef28f91c20ccbc948055520a56b695a7a05a96a259"))
+
+; Get block by height
+(expect-that "Get block 42 by Height" (compose (at 'height) (= 800042)) (get-block-by-height 800042))
+
+; Estimate block time
+; Chain is outdated
+(env-chain-data {'block-time:(time "2023-07-24T19:00:00Z" )})
+(expect-failure "Get block for tomorrow" "Tip outdated" (est-height-at-time  (time "2023-07-25T11:34:00Z")))
+
+(env-chain-data {'block-time:(time "2023-07-24T11:00:00Z" )})
+(expect "Get block for tomorrow" 800194 (est-height-at-time  (time "2023-07-25T11:34:00Z")))
+
+; Request a block not alredy mined
+(expect-failure "Not already mined" "Height not reached" (select-block 800051 (time "2023-07-24T00:00:00Z") 0))
+
+; Request a block in the future
+(expect-failure "Future block" "Block not found" (select-block 800040 (time "2023-07-25T00:00:00Z") 0))
+
+; Request block afer 10:25, should be 45
+(expect-that "Block 45 expected" (compose (at 'height) (= 800045)) (select-block 800040 (time "2023-07-24T10:25:00Z") 0))
+
+; Verify that select-hash works
+(expect-that "Block 45 HASH expected" (compose (int-to-str 16) (= "ae682d2e2ff74320d7323fbfb24ad7213c4bf8ceaf1605000000000000000000")) (select-hash 800040 (time "2023-07-24T10:25:00Z") 0))
+
+; Request block afer 11:11, should be 48
+(expect-that "Block 48 expected" (compose (at 'height) (= 800048)) (select-block 800040 (time "2023-07-24T11:11:00Z") 0))
+
+; Request block afer 11:11, but a min height of 48 => should be 49
+(expect-that "Block 49 expected" (compose (at 'height) (= 800049)) (select-block 800049 (time "2023-07-24T11:11:00Z") 0))
+
+; Request block afer 11:34, should be 50
+(expect-that "Block 50 expected" (compose (at 'height) (= 800050)) (select-block 800040 (time "2023-07-24T11:34:00Z") 0))
+
+; But now we request at least a confirmation
+; Request a block in the future
+(expect-failure "Future block" "not enough confirmations" (select-block 800040 (time "2023-07-24T11:34:00Z") 1))
+
+(commit-tx)

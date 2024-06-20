@@ -1,0 +1,6 @@
+(load "init.repl")
+
+(begin-tx)
+(use btc-oracle)
+(load "vectors/blocks-0-2500-init.repl")
+(commit-tx)

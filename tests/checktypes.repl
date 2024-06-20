@@ -1,0 +1,3 @@
+(load "init.repl")
+
+(typecheck "btc-oracle")

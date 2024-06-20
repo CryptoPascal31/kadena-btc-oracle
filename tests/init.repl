@@ -1,0 +1,10 @@
+(env-data {"disable-test-accounts":true,"disable-marmalade":true})
+
+(load "kadena_repl_sandbox/kda-env/init.repl")
+
+(begin-tx)
+(load "../pact-sha256/sha256.pact")
+(load "../btc-oracle.pact")
+(create-table btc-block-table)
+(create-table tip-table)
+(commit-tx)

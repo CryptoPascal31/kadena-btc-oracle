@@ -1,0 +1,38 @@
+(load "init.repl")
+
+; For this test we play in the 800000 - 800050 blocks range
+
+; https://mempool.space/block/00000000000000000002a7c4c1e48d76c5a37902165a270156b7a8d72728a054
+; https://mempool.space/block/00000000000000000003ebef28f91c20ccbc948055520a56b695a7a05a96a259
+
+; Block 40 TS is 2023-07-24 09:46:08
+; Last block: 50 TS = 2023-07-24 11:34:14
+(begin-tx)
+(use btc-oracle)
+(load "vectors/blocks-800000-800050-init.repl")
+(commit-tx)
+
+(begin-tx)
+(use btc-oracle)
+; First for sanity check, we verify the tip
+(expect-that "Block 50 expected" (compose (at 'height) (= 800050)) (get-tip))
+
+; Try to report with a mssing block
+(expect-failure "Missing block" "row not found" (report-block "0080c822509f30949f1954e547e7eedf364135a220eb3b3a562405000000000000000000e3eafe5f1d84cd29567337d0a736c1a9350934efcac3ad985dcfcd7fe3aefaab7368be6494380517108ad45c"))
+
+; Try to report an already existing block
+(expect-failure "Existing block" "row found" (report-block "00200020e5ec2f084a5a5caacd54d21549378cc96852b9d5dad703000000000000000000955c64fde227fd1242a443868ceff563e2f6f49716a527e4a133e24a4d551d88f218be6494380517e9220ecf"))
+
+; Try to report a bad nonce block
+(expect-failure "Bad nocne" "Proof of work error" (report-block "0060002059a2965aa0a795b6560a52558094bccc201cf928efeb03000000000000000000e99de518a3b58ee74e7dedecc17fdc4f9c4b7114e9d470d4aeb566ac8878d08bef62be64943805174f8a99e0"))
+
+; Try to report with a bad target
+(expect-failure "Bad target" "Target error" (report-block "0060002059a2965aa0a795b6560a52558094bccc201cf928efeb03000000000000000000e99de518a3b58ee74e7dedecc17fdc4f9c4b7114e9d470d4aeb566ac8878d08bef62be64943805184f8a99ea"))
+
+; Try to report a good block
+(report-block "0060002059a2965aa0a795b6560a52558094bccc201cf928efeb03000000000000000000e99de518a3b58ee74e7dedecc17fdc4f9c4b7114e9d470d4aeb566ac8878d08bef62be64943805174f8a99ea")
+
+; Then we verify the tip
+(expect-that "Block 51 expected" (compose (at 'height) (= 800051)) (get-tip))
+
+(commit-tx)

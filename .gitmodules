@@ -1,0 +1,6 @@
+[submodule "pact-sha256"]
+	path = pact-sha256
+	url = https://github.com/CryptoPascal31/pact-sha256
+[submodule "tests/kadena_repl_sandbox"]
+	path = tests/kadena_repl_sandbox
+	url = https://github.com/CryptoPascal31/kadena_repl_sandbox

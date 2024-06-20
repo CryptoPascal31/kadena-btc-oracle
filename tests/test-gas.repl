@@ -1,0 +1,32 @@
+(load "init.repl")
+
+; For this test we play in the 800000 - 800050 blocks range
+
+; https://mempool.space/block/00000000000000000002a7c4c1e48d76c5a37902165a270156b7a8d72728a054
+; https://mempool.space/block/00000000000000000003ebef28f91c20ccbc948055520a56b695a7a05a96a259
+
+
+(begin-tx)
+(use btc-oracle)
+(load "vectors/blocks-800000-800050-init.repl")
+(commit-tx)
+
+(begin-tx)
+(use btc-oracle)
+(env-gasmodel "table")
+(env-gaslimit 1000000)
+
+(env-gas 0)
+(load "vectors/blocks-800051-800060.repl")
+
+(print (format "Report Gas: {}" [(/ (env-gas) 10)]))
+
+(env-gas 0)
+(select-block 800010 (time "2023-07-24T10:25:00Z") 0)
+(print (format "Select 50 Block to rewind: {}" [(env-gas)]))
+
+(env-gas 0)
+(select-block 800059 (time "2023-07-24T10:25:00Z") 0)
+(print (format "Select 1 Block to rewind: {}" [(env-gas)]))
+
+(commit-tx)
