@@ -7,12 +7,12 @@
 
 
 (begin-tx)
-(use btc-oracle)
+(use btc_oracle_mod)
 (load "vectors/blocks-800000-800050-init.repl")
 (commit-tx)
 
 (begin-tx)
-(use btc-oracle)
+(use btc_oracle_mod)
 (env-gasmodel "table")
 (env-gaslimit 1000000)
 

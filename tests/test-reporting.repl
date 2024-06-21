@@ -8,12 +8,12 @@
 ; Block 40 TS is 2023-07-24 09:46:08
 ; Last block: 50 TS = 2023-07-24 11:34:14
 (begin-tx)
-(use btc-oracle)
+(use btc_oracle_mod)
 (load "vectors/blocks-800000-800050-init.repl")
 (commit-tx)
 
 (begin-tx)
-(use btc-oracle)
+(use btc_oracle_mod)
 ; First for sanity check, we verify the tip
 (expect-that "Block 50 expected" (compose (at 'height) (= 800050)) (get-tip))
 

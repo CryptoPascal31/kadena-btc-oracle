@@ -1,5 +1,5 @@
-(module btc-oracle GOV
-  (use sha256)
+(module btc_oracle_mod GOV
+  (use sha256_mod)
   (use free.util-time)
   (use free.util-math)
   (use free.util-lists)
