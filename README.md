@@ -40,4 +40,26 @@ The function `(select-block after-height after-time confirmations)` can be used 
 
 ## Util functions
 
-TBC
+`(get-block-by-hex-hash hex-hash:string)`: Return a block by it's hash.
+
+`(get-block-by-height height:integer)`: Return a block by it's height.
+
+`(get-tip)`: Return the tip
+
+`(get-last-blocks count:integer)`: Return the last blocks count.
+
+`(est-height-at-time target:time)`: Estimate the block height at a given time, respect to the tip  Timestamp
+
+## Block's schema
+
+A BTC block is encoded using the following schema:
+
+```pact
+(defschema btc-block
+  header:string ; BTC Block header in Hex String
+  ts:time ; Timestamp of the block
+  header-hash:integer ; Computed SHA256 hash of the header
+  target:integer ; Computed POW hash target
+  height:integer ; height of the block in the blockchain
+)
+```
