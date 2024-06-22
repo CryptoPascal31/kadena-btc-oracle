@@ -1,0 +1,23 @@
+{
+  "name": "btc_oracle_reporter",
+  "version": "1.0.0",
+  "description": "Kadena BTC Oreacle reporter",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "esbuild index.js --bundle --platform=node --outfile=dist/btc_reporter.js",
+    "eslint": "eslint index.js utils/*.js"
+  },
+  "dependencies": {
+    "@kadena/client": "^1.11.1",
+    "@mempool/mempool.js": "^2.3.0",
+    "dotenv": "^16.4.5"
+  },
+  "author": "CryptoPascal",
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "^0.21.4",
+    "eslint": "8.57.0"
+  }
+}
