@@ -213,7 +213,7 @@
           (enumerate 2 count))
   )
 
-  (defun est-height-at-time (target:time)
+  (defun est-btc-height-at-time (target:time)
     @doc "Estimate a BTC height at a given time"
     (bind (get-tip) {'ts:=tip-ts, 'height:=tip-height}
       ; Tip must be recent
