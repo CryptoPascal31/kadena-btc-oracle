@@ -1,7 +1,7 @@
 {
   "name": "btc_oracle_reporter",
   "version": "1.0.0",
-  "description": "Kadena BTC Oreacle reporter",
+  "description": "Kadena BTC Oracle Example Reporter",
   "main": "index.js",
   "type": "module",
   "scripts": {
