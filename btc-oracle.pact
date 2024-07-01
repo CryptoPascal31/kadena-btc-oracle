@@ -1,5 +1,4 @@
 (module btc_oracle_mod GOV
-  (use sha256_mod)
   (use free.util-time)
   (use free.util-math)
   (use free.util-lists)
@@ -85,6 +84,10 @@
     @doc "Returns the targer from a BTC header"
     (unpack-target (i32-field header 144)))
 
+  (defun compute-hash:integer (header:string)
+    (enforce (= 160 (length header)) "Header must have a size of 80 bytes")
+    (sha256_mod.digest-btc-header header))
+
   (defun enforce-pow (computed-hash:integer target:integer)
     @doc "Verify that the hash of the block meet a target specification"
     (enforce (<= (swap-end-256 computed-hash) target) "Proof of work error"))
@@ -113,7 +116,7 @@
   (defun init-block:string (header:string block-height:integer)
     @doc "Initialize the database with an header and a corresponding block height. \
         \ Can only be used once"
-    (let ((computed-hash (digest-btc-header header))
+    (let ((computed-hash (compute-hash header))
           (target (get-target header))
           (ts (get-timestamp header)))
 
@@ -130,7 +133,7 @@
 
   (defun report-block:string (header:string)
     @doc "Report a new block header"
-    (let ((computed-hash (digest-btc-header header))
+    (let ((computed-hash (compute-hash header))
           (previous-hash (get-previous-hash header))
           (target (get-target header))
           (ts (get-timestamp header)))
