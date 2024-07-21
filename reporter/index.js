@@ -14,7 +14,7 @@ const make_nonce = () => "In_Brothers_We_Trust:"+randomUUID()
 function kadena_tip()
 {
   return local_pact(`(${process.env.ORACLE_MODULE}.get-tip)`, process.env.NETWORKID, process.env.CHAINID )
-        .then(({height, ...rest}) => ({height:parseInt(height.int), ...rest}))
+        .then(({height, "header-hash":hh, ...rest}) => ({height:parseInt(height.int), header_hash:BigInt(hh.int), ...rest}))
 }
 
 const single_transaction = header =>  Pact.builder.execution(`(${process.env.ORACLE_MODULE}.report-block (read-msg 'hdr))`)
@@ -49,16 +49,29 @@ async function do_report(header)
 
 }
 
+const rev_endianess = v=> Array.from({length:32}, (_,i)=>v.slice(i*2,i*2+2)).reverse().join("")
+const hash_to_bi = x => BigInt("0x"+rev_endianess(x))
+
+
 async function do_process(verbose)
 {
   if(lock)
     return;
   const btc_height = await blocks.getBlocksTipHeight();
-  const kadena_height = await kadena_tip().then(({height}) => height)
+  var {height:kadena_height, header_hash:kadena_tip_hash} = await kadena_tip();
 
   if(verbose)
     console.log(`Kadena Oracle Check ${btc_height} --> ${kadena_height}`)
 
+  /* We check the Hash of the current Kadena Height on BTC to be sure we didn't record an orphan block */
+  const tip_hash = await blocks.getBlockHeight({ height: kadena_height }).then(hash_to_bi);
+  if(tip_hash != kadena_tip_hash)
+  {
+    console.log("Tip hashes don't match => Probably an Orphan block");
+    console.log("Mempool hash:"+tip_hash);
+    console.log("Kadena hash:"+kadena_tip_hash);
+    kadena_height--;
+  }
 
   if(kadena_height < btc_height)
   {
