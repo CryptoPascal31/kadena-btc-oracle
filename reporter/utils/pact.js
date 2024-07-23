@@ -1,8 +1,9 @@
-import {createClient, Pact} from '@kadena/client'
+import {createClient, Pact, getHostUrl} from '@kadena/client'
 
 const LOCAL_GAS_LIMIT = 10000
+const host = getHostUrl(process.env.NODE)
 
-const client = createClient()
+const client = createClient(host)
 
 function local_check(cmd, options)
 {
