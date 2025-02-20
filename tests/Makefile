@@ -38,9 +38,6 @@ test-range-2: vectors/blocks-800000-802500-init.repl
 
 test-ranges: test-range-0 test-range-1 test-range-2
 
-checktypes:
-	pact checktypes.repl
-
 tests: test-reporting test-consuming test-gas test-ranges
 
 clean:
