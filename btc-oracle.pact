@@ -173,7 +173,7 @@
   )
 
   (defun select-block:object{btc-block} (after-height:integer after-time:time confirmations:integer)
-    (let* ((tip (get-tip))
+    (let  ((tip (get-tip))
            (tip-height (at 'height tip))
            (blocks-to-rewind (- tip-height after-height)))
       (enforce (>= blocks-to-rewind 0) "Height not reached")
