@@ -63,15 +63,19 @@ async def gen_file(start, stop, _init, _log):
                     return db[_k].hex()
 
                 if _init:
-                    fd.write('(init-block "{:s}" {:d})\n'.format(await __get(start),start))
+                    fd.write('(begin-tx "Init")\n')
+                    fd.write('  (btc_oracle_mod.init-block "{:s}" {:d})\n'.format(await __get(start),start))
                     if _log:
-                        fd.write('(print (format "INIT-BLOCK {{}}" [{:d}]))'.format(start))
+                        fd.write('  (print (format "INIT-BLOCK {{}}" [{:d}]))\n'.format(start))
+                    fd.write("(commit-tx)\n")
 
                 for c in chunked(range(start+1 if _init else start, stop+1),10):
+                    fd.write('(begin-tx "Range {:d}-{:d}")\n'.format(start, stop))
                     for h in c:
-                        fd.write('(report-block "{:s}")\n'.format(await __get(h)))
+                        fd.write('  (btc_oracle_mod.report-block "{:s}")\n'.format(await __get(h)))
                     if _log:
-                        fd.write('(print (format "REPORT-BLOCK {{}}" [{:d}]))\n'.format(h))
+                        fd.write('  (print (format "REPORT-BLOCK {{}}" [{:d}]))\n'.format(h))
+                    fd.write("(commit-tx)\n")
 
                 fd.write("\n")
 
